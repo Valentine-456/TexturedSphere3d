@@ -7,6 +7,30 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top">
+            <TextBlock Text="Camera Controls" FontWeight="Bold" Margin="0,0,0,5"/>
 
+            <TextBlock Text="Distance" />
+            <Slider x:Name="DistanceSlider" Minimum="5" Maximum="50" Value="20" TickFrequency="1" IsSnapToTickEnabled="True"/>
+
+            <TextBlock Text="Rotate X (deg)" Margin="0,10,0,0"/>
+            <Slider x:Name="RotateXSlider" Minimum="-90" Maximum="90" Value="10" TickFrequency="5"/>
+
+            <TextBlock Text="Rotate Y (deg)" Margin="0,10,0,0"/>
+            <Slider x:Name="RotateYSlider" Minimum="-180" Maximum="180" Value="45" TickFrequency="10"/>
+
+            <TextBlock Text="Sphere Radius" Margin="0,20,0,0"/>
+            <Slider x:Name="RadiusSlider" Minimum="1" Maximum="10" Value="5" TickFrequency="0.5"/>
+
+            <TextBlock Text="Lat Divisions" Margin="0,10,0,0"/>
+            <Slider x:Name="LatDivSlider" Minimum="4" Maximum="60" Value="20" TickFrequency="1"/>
+            <Button Content="Update" Margin="0,20,0,0" Click="UpdateHandler"/>
+        </StackPanel>
+
+        <Canvas Name="Viewport" Grid.Column="1" Background="Black"/>
     </Grid>
 </Window>
