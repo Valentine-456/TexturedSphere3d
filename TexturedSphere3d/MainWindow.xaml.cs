@@ -45,6 +45,7 @@ namespace TexturedSphere3d
 
             float radius = (float)RadiusSlider.Value;
             int latDiv = (int)LatDivSlider.Value;
+            int lonDiv = (int)LonDivSlider.Value;
 
             float radX = MathF.PI * rotX / 180f;
             float radY = MathF.PI * rotY / 180f;
@@ -55,7 +56,7 @@ namespace TexturedSphere3d
             );
 
             camera = new Camera(pos, Vector3.Zero, (float)Viewport.ActualWidth / (float)Viewport.ActualHeight);
-            sphere = new Sphere(radius, latDiv);
+            sphere = new Sphere(radius, latDiv, lonDiv);
             sphere.Render(camera, Viewport);
         }
     }

@@ -16,31 +16,31 @@ namespace TexturedSphere3d
         public List<Vector2> TexCoords { get; } = new();
         Matrix4x4 ModelMatrix { get; set; } = Matrix4x4.Identity;
 
-        public Sphere(float radius, int subdivisions)
+        public Sphere(float radius, int latSubdivisions, int lonSubdivisions)
         {
-            for (int i = 0; i <= subdivisions; i++)
+            for (int i = 0; i <= latSubdivisions; i++)
             {
-                float theta = (float)(Math.PI * i / subdivisions);
+                float theta = (float)(Math.PI * i / latSubdivisions);
                 float y = (float)Math.Cos(theta);
                 float r = (float)Math.Sin(theta);
 
-                for (int j = 0; j <= subdivisions; j++)
+                for (int j = 0; j <= lonSubdivisions; j++)
                 {
-                    float phi = (float)(2 * Math.PI * j / subdivisions);
+                    float phi = (float)(2 * Math.PI * j / lonSubdivisions);
                     float x = r * (float)Math.Cos(phi);
                     float z = r * (float)Math.Sin(phi);
 
                     Vertices.Add(new Vector3(x, y, z) * radius);
-                    TexCoords.Add(new Vector2(j / (float)subdivisions, i / (float)subdivisions));
+                    TexCoords.Add(new Vector2(j / (float)lonSubdivisions, i / (float)latSubdivisions));
                 }
             }
 
-            for (int i = 0; i < subdivisions; i++)
+            for (int i = 0; i < latSubdivisions; i++)
             {
-                for (int j = 0; j < subdivisions; j++)
+                for (int j = 0; j < lonSubdivisions; j++)
                 {
-                    int current = i * (subdivisions + 1) + j;
-                    int next = current + subdivisions + 1;
+                    int current = i * (lonSubdivisions + 1) + j;
+                    int next = current + lonSubdivisions + 1;
 
                     Faces.Add((current, next, current + 1));
                     Faces.Add((current + 1, next, next + 1));
