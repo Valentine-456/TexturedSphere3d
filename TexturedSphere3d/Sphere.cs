@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace TexturedSphere3d
 {
@@ -13,8 +14,10 @@ namespace TexturedSphere3d
     {
         public List<Vector3> Vertices { get; } = new();
         public List<(int A, int B, int C)> Faces { get; } = new();
-        public List<Vector2> TexCoords { get; } = new();
+        public List<Vector2> TextureCoords { get; } = new();
         Matrix4x4 ModelMatrix { get; set; } = Matrix4x4.Identity;
+        public WriteableBitmap textureBitmap = null;
+
 
         public Sphere(float radius, int latSubdivisions, int lonSubdivisions)
         {
@@ -31,7 +34,7 @@ namespace TexturedSphere3d
                     float z = r * (float)Math.Sin(phi);
 
                     Vertices.Add(new Vector3(x, y, z) * radius);
-                    TexCoords.Add(new Vector2(j / (float)lonSubdivisions, i / (float)latSubdivisions));
+                    TextureCoords.Add(new Vector2(j / (float)lonSubdivisions, i / (float)latSubdivisions));
                 }
             }
 
@@ -52,21 +55,51 @@ namespace TexturedSphere3d
         {
             canvas.Children.Clear();
 
-            Matrix4x4 mvp = ModelMatrix * camera.ViewMatrix * camera.ProjectionMatrix;
+            Matrix4x4 mv = ModelMatrix * camera.ViewMatrix;
+            Matrix4x4 mvp = mv * camera.ProjectionMatrix;
 
             foreach (var face in Faces)
             {
-                var p1 = Project(Vertices[face.A], mvp, canvas);
-                var p2 = Project(Vertices[face.B], mvp, canvas);
-                var p3 = Project(Vertices[face.C], mvp, canvas);
+                var w1 = Vector3.Transform(Vertices[face.A], ModelMatrix);
+                var w2 = Vector3.Transform(Vertices[face.B], ModelMatrix);
+                var w3 = Vector3.Transform(Vertices[face.C], ModelMatrix);
 
-                var polygon = new System.Windows.Shapes.Polygon
+                var edge1 = w2 - w1;
+                var edge2 = w3 - w1;
+                var normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));
+                var toCamera = camera.Position - w1;
+
+                if (Vector3.Dot(normal, toCamera) < 0)
                 {
-                    Points = new System.Windows.Media.PointCollection { p1, p2, p3 },
-                    Stroke = Brushes.Gray,
-                    StrokeThickness = 1
-                };
-                canvas.Children.Add(polygon);
+                    continue;
+                }
+
+
+                var p1 = Project(w1, camera.ViewMatrix * camera.ProjectionMatrix, canvas);
+                var p2 = Project(w2, camera.ViewMatrix * camera.ProjectionMatrix, canvas);
+                var p3 = Project(w3, camera.ViewMatrix * camera.ProjectionMatrix, canvas);
+
+
+                if (textureBitmap != null)
+                {
+                    var polygon = new System.Windows.Shapes.Polygon
+                    {
+                        Points = new System.Windows.Media.PointCollection { p1, p2, p3 },
+                        Stroke = Brushes.Red,
+                        StrokeThickness = 1
+                    };
+                    canvas.Children.Add(polygon);
+                }
+                else
+                {
+                    var polygon = new System.Windows.Shapes.Polygon
+                    {
+                        Points = new System.Windows.Media.PointCollection { p1, p2, p3 },
+                        Stroke = Brushes.Gray,
+                        StrokeThickness = 1
+                    };
+                    canvas.Children.Add(polygon);
+                }
             }
         }
 

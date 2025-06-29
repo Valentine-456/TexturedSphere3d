@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace TexturedSphere3d
 {
@@ -19,6 +20,7 @@ namespace TexturedSphere3d
     {
         private Sphere sphere;
         private Camera camera;
+        private WriteableBitmap bitmap = null;
         public MainWindow()
         {
             InitializeComponent(); 
@@ -35,6 +37,19 @@ namespace TexturedSphere3d
         private void UpdateHandler(object sender, RoutedEventArgs e)
         {
             UpdateScene();
+        }
+
+        private void LoadTexture_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
+                bitmap = new WriteableBitmap(bitmapImage);
+                UpdateScene();
+            }
         }
 
         private void UpdateScene()
@@ -57,6 +72,10 @@ namespace TexturedSphere3d
 
             camera = new Camera(pos, Vector3.Zero, (float)Viewport.ActualWidth / (float)Viewport.ActualHeight);
             sphere = new Sphere(radius, latDiv, lonDiv);
+            if(bitmap != null )
+            {
+                sphere.textureBitmap = bitmap;
+            }
             sphere.Render(camera, Viewport);
         }
     }
